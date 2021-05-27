@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="shortcut icon" type="image/x-icon" href="resource/nodes.png" />
+    <title>Denoising Autoencoder with TensorFlow.js</title>
+    <script src="dist/bundle.js"></script>
+
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Orbitron':300,300italic,700,700italic">
+    <link rel="stylesheet" href="//cdn.rawgit.com/necolas/normalize.css/master/normalize.css">
+    <link rel="stylesheet" href="//cdn.rawgit.com/milligram/milligram/master/dist/milligram.min.css">
+    <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.no-icons.min.css" rel="stylesheet">
+    <link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet">
+
+        <style>
+                        * {
+                  margin: 0;
+                  padding: 0;
+                  box-sizing: border-box;
+                }
+
+                :root {
+                --primary-color:#191919;
+                --secondary-color: #422C73;
+                --complimentary-color: #88BFB5;
+                --contrast-color: #F2E527;
+                --light-color: #D2A9D9;
+                }
+                .grid-container {
+                  display: grid;
+                  grid-template-columns: auto auto auto;
+                  grid-gap: 150px;
+                  padding: 25px;
+                }
+
+                .grid-container > div {
+                  border-radius:10%;
+                  text-align: center;
+                }
+                .container {
+                  font-family: Montserrat, sans-serif;
+                  color:wheat;
+                }
+                .card-img-top{
+                   border-radius: 50%;
+                }
+                .button-black {
+                    background-color: black;
+                  }
+                nav a {
+                    font-size:20px;
+                    color: #fff;
+                    text-decoration: none;
+                    padding: 10px;
+                    text-align: center;
+                }
+
+                nav {
+                    position: fixed;
+                    left: 0;
+                    z-index: 50;
+                    display: flex;
+                    justify-content: space-around;
+                    flex-direction: column;
+                    height: 100vh;
+                    background: var(--secondary-color);
+                }
+
+                section {
+                    position: absolute;
+                    top: 0;
+                    height: 10vh;
+                    width: 0;
+                    opacity: 0;
+                    transition: all ease-in .5s;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    overflow-x: hidden;
+                } 
+
+                section h1 {
+                    color: #ccff66;
+                    font-size: 50px;
+                    text-transform: uppercase;
+                    opacity: 0;
+                }
+
+                /* Styles applied on trigger */
+                section:target {
+                    opacity: 1;
+                    position: absolute;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    z-index: 10;
+                }
+                section:target h1 {
+                    opacity: 0;
+                    animation: 2s fadeIn forwards .5s;
+                }
+
+                #second {
+                  background-image: linear-gradient(to right top, #123a76, #00476e, #004d53, #1c4e39, #434c2f); }
+
+                #third {
+                  background-image: linear-gradient(to right top, #c682d5, #6b8cda, #008bbc, #00818b, #33715e);}
+
+                #fourth {
+                  background-image: linear-gradient(to right top, #665692, #2d6499, #006d8d, #007176, #33715e);}                  
+               .card{
+                 color:wheat;
+               }
+                  @keyframes fadeIn {
+                    100% { opacity:1 }
+                }
+    </style>
+</head>
+
+<body>
+  <nav>
+   <a href="#second">Project</i></a>
+   <a href="#third">Technology Used</a>
+   <a href="#fourth">Team Members</a>
+ </nav>
+      <section id= 'second'style="padding-left: 185px;">
+          <div class= 'container' style="padding-bottom: 100px;">                 
+                       <div class="page-wrap">
+                        <div class="container">
+                          <div class="Navigation">
+                           </div>
+                            <div class="row" style="display: inline-block; padding-top: 50px;padding-right: 10px;margin-right: 128px;margin-left: 1px;">
+                                 <h2><I>IMAGE DENOISING</I></h2>
+                                <h3 class="title" style="text-align: center">Remove noise from handwritten digits with a neural network!</h3>
+                                <h5 class="title" style="text-align: center">This demo uses a denoising autoencoder running in TensorFlow.js.</h4>
+                            </div>
+                            <div class="row">
+                                <div class="column" style="display:flex;justify-content:center;align-items:center;">
+                                    <figure style="align-items: center">
+                                        <canvas id="original-img"></canvas>
+                                        <figcaption>Original image</figcaption>
+                                    </figure>
+                                </div>
+                                <div class="column" style="display:flex;justify-content:center;align-items:center;">
+                                    <figure>
+                                        <canvas id="noisy-img"></canvas>
+                                        <figcaption>Image with noise</figcaption>
+                                    </figure>
+                                </div>
+                                <div class="column" style="display:flex;justify-content:center;align-items:center;">
+                                    <figure>
+                                        <canvas id="restored-img"></canvas>
+                                        <figcaption>Restored image</figcaption>
+                                    </figure>
+                                </div>
+                            </div>
+                            <div class="column column-50 column-offset-25"  style="padding-left: 300px;">
+                                    <button class="button-black" id="new-digit">Load new digit</button>
+                                    <button  class="button-black" id="new-noise">Reapply noise</button>                
+                            </div>
+                        </div>
+                    </div>
+                  </section>
+            </div>
+                  <section id= 'third'>
+                    <div class="grid-container">
+                      <div><a href="https://nodejs.org/en/"><img border="0" alt="W3Schools" src="resource/node.png" width="200" height="200"></a></div>
+                      <div><a href="https://www.tensorflow.org/"><img border="0" alt="W3Schools" src="resource/tensorlow.png" width="200" height="200"></a></div>
+                      <div><a href="https://milligram.io/"><img border="0" alt="W3Schools" src="resource/miligram.png" width="200" height="200"></a></div>  
+                      <div><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript"><img border="0" alt="W3Schools" src="resource/javascript.png" width="200" height="200"></a></div>
+                      <div><a href="https://www.python.org/"><img border="0" alt="W3Schools" src="resource/python.png" width="200" height="200"></a></div>
+                      <div><a href="https://keras.io/"><img border="0" alt="W3Schools" src="resource/keras.png" width="200" height="200"></a></div>
+                    </div>
+                  </section>
+                  
+                 <section id= 'fourth'>
+                  <div class="card" style="width:200px ;padding:20px;">
+                  <img class="card-img-top" src="default_profile.png" alt="Card image">
+                  <div class="card-body">
+                    <h4 class="card-title">Kunal Hedoo</h4>
+                    <p class="card-text">Full Stack Developer</p>
+                    <a href="https://www.linkedin.com/in/kunal-hedaoo-268b5719a/" class="btn btn-primary">See Profile</a>
+                  </div>
+                </div>
+                <div class="card" style="width:200px; padding:20px;">
+                  <img class="card-img-top" src="default_profile.png" alt="Card image">
+                  <div class="card-body">
+                    <h4 class="card-title">Shahajal Jain</h4>
+                    <p class="card-text">Designer</p>
+                    <a href="https://www.linkedin.com/in/shahajal-jain-b49a42196/" class="btn btn-primary">See Profile</a>
+                  </div>
+                </div>
+                <div class="card" style="width:200px;padding:20px;">
+                  <img class="card-img-top" src="default_profile.png" alt="Card image">
+                  <div class="card-body">
+                    <h4 class="card-title">Shivani Jain</h4>
+                    <p class="card-text">Backend Developer</p>
+                    <a href="https://www.linkedin.com/in/shivani-jain-94177a168/" class="btn btn-primary">See Profile</a>
+                  </div>
+                </div>
+                <div class="card" style="width:200px; padding:20px;">
+                  <img class="card-img-top" src="resource/default_profile.png" alt="Card image">
+                  <div class="card-body">
+                    <h4 class="card-title">Arpit Prajapati</h4>
+                    <p class="card-text">Machine Learning Engineer</p>
+                    <a href="https://www.linkedin.com/in/arpit-prajapati-63433b192/" class="btn btn-primary">See Profile</a>
+                  </div>
+                </div>
+                  </section> 
+</body>
+</html>
